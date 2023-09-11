@@ -21,9 +21,10 @@ data = html_element(res, "h2:contains('Schedule and results') + table") %>% html
 View(data)
 
 # Manually remove the heading rows and extra columns
+# We will discuss the need for \\ in the filtering momentarily
 data = select(data, "Datetime, TV":"Site (attendance)  city, state") %>%
   filter(!(`Datetime, TV` %in% c("Exhibition", "Regular Season", "ACC Tournament", "NCAA Tournament") |
-             str_starts(`Datetime, TV`, "*Non-conference")))
+             str_starts(`Datetime, TV`, "\\*Non-conference")))
 
 View(data)
 
@@ -71,8 +72,11 @@ data$unc_score
 # to work with them.
 data = mutate(data, unc_score=as.numeric(unc_score), other_score=as.numeric(other_score))
 
-plot(1:nrow(data), data$unc_score, col="#4B9CD3", type = "lines")
-lines(1:nrow(data), data$other_score)
+data %>%
+  ggplot(aes(x=1:nrow(data))) +
+    geom_line(aes(y=unc_score), color="#4B9CD3") +
+    geom_line(aes(y=other_score))
+  
 
 # We can repeat this process to extract the arena and the attendance
 data[,c("arena", "attendance", "city")] = str_match(data$`Site (attendance)  city, state`, "^(.*)\\(([,[:digit:]]+)\\)(.*)$")[,2:4]
@@ -89,7 +93,11 @@ data = mutate(data, arena=str_trim(arena))
 data = mutate(data, attendance=as.numeric(str_remove(attendance, ",")))
 
 # now we can plot it
-plot(1:nrow(data), data$attendance, type="lines")
+data %>%
+  ggplot(aes(x=1:nrow(data), y=attendance)) +
+    geom_line()
+
+# Why is there a hole at game 12?
 
 # A few more examples of using regular expressions. We can parse the date, time,
 # and network column

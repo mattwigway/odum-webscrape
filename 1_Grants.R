@@ -45,7 +45,7 @@ grant_elements = html_elements(res, ".grant-content__primary")
 # we want to parse each grant element into one row of a dataframe. We use map_dfr
 # which will call the function on each element of grant_elements and combine the
 # results into a data frame
-grants = map_dfr(grant_elements, function (element) {
+grants = map(grant_elements, function (element) {
   # We need to extract the data we need from each grant element. We don't need to
   # include the .grant-content__primary class as we are extracting from within each
   # grant element.
@@ -62,15 +62,15 @@ grants = map_dfr(grant_elements, function (element) {
   
   amount = html_element(element, ".grants-list__grant-header--estimated-award-amounts dd") %>% html_text2()
   
-  # We need to return the values as a named list, with each column of the data frame
+  # We need to return the values as a named tibble row, with each column of the data frame
   # mapping onto the appropriate value.
-  return(list(
+  return(tibble_row(
     "title"=grant_title,
     "url"=grant_url,
     "agency"=agency,
     "amount"=amount
   ))
-})
+}) %>% list_rbind()
 
 # Like many websites, grants.ca.gov presents information in multiple pages. We need to
 # reverse-engineer how their page structure works. Usually information about the pages is
@@ -109,19 +109,19 @@ while (has_next_page) {
   # and use the same code to extract grants
   grant_elements = html_elements(res, ".grant-content__primary")
   
-  grants = map_dfr(grant_elements, function (element) {
+  grants = map(grant_elements, function (element) {
     grant_title = html_element(element, "h3.entry-title a") %>% html_text2()
     grant_url = html_element(element, "h3.entry-title a") %>% html_attr("href")
     agency = html_element(element, ".grants-list__grant-header--grantmaking-agency dd") %>% html_text2()
     amount = html_element(element, ".grants-list__grant-header--estimated-award-amounts dd") %>% html_text2()
 
-    return(list(
+    return(tibble_row(
       "title"=grant_title,
       "url"=grant_url,
       "agency"=agency,
       "amount"=amount
     ))
-  })
+  }) %>% list_rbind()
   
   # we now add the grants from this page to the end of our list
   results[[current_page]] = grants
@@ -159,15 +159,14 @@ get_description = function(url) {
   # the description. Unfortunately, there's not a unique class or ID we can use to
   # find this. Instead, we will use the :contains CSS selector to find columns that
   # contain the text "Description"
-  desc = html_elements(resp, ".wp-block-column:contains(Description)") %>%
-    first() %>%
+  desc = html_element(resp, ".wp-block-column:contains(Description)") %>%
     html_text2()
   
   return(desc)
 }
 
 # rowwise is similar to groupby, except that every row is treated as its own group
-# we are only retrieving the first 2 descriptions to avoid hammering the CA Grants
+# we are only retrieving the first 2 descriptions to avoid overloading the CA Grants
 # server with many spurious requests, but it would work for all the grants
 with_desc = rowwise(all_grants[1:2,], everything()) %>%
   mutate(description=get_description(url))
