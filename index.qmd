@@ -4,8 +4,8 @@ author: Matt Bhagat-Conway
 format:
     revealjs:
         theme: [default, unc.scss]
-        width: 1600
-        height: 900
+        width: 1920
+        height: 1080
         footer: https://projects.indicatrix.org/odum-webscrape
         logo: UNC_logo_RGB.png
         slide-number: true
@@ -195,7 +195,7 @@ Within a character class,
 
 # Scraping sites that use Javascript
 
-![Disabling JavaScript in Chrome DevTools w:600px](disable-js.png)
+![Disabling JavaScript in Chrome DevTools](disable-js.png)
 
 # Scraping sites that use Javascript
 
