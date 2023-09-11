@@ -84,7 +84,7 @@ data[,c("arena", "attendance", "city")] = str_match(data$`Site (attendance)  cit
 View(data)
 
 # We still need to do a little data cleaning on these columns. For the arena column, there
-# is a space at the end of the arena name. The trimws() function will remove this.
+# is a space at the end of the arena name. The str_trim() function will remove this.
 data = mutate(data, arena=str_trim(arena))
 
 # As before, we need to make the attendance into a number rather than a string (chr, i.e. text data)
