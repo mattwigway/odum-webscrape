@@ -55,6 +55,10 @@ Guest presenter: Michele Hayslett, UNC Libraries
 - California grants portal
 - https://grants.ca.gov
 
+# Example code
+
+- Download from [https://github.com/mattwigway/odum-webscrape](https://github.com/mattwigway/odum-webscrape)
+
 # URL structure
 
 https://www.bing.com/search?q=unc&form=QBLH&sp=-1&pq=unc&sc=8-3&qs=n&sk=&cvid=54A0FE5E1C194FC4ACB88A232A9740F9
